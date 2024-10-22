@@ -10,7 +10,35 @@ class StudentApp extends StatelessWidget {
     return MaterialApp(
       title: 'Student App',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        primarySwatch: Colors.orange,
+        brightness: Brightness.light,
+        scaffoldBackgroundColor: Colors.grey[100],
+        appBarTheme: AppBarTheme(
+          backgroundColor: Colors.orange[700],
+          titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
+          iconTheme: IconThemeData(color: Colors.white),
+        ),
+        buttonTheme: ButtonThemeData(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(18.0),
+          ),
+          buttonColor: Colors.orangeAccent,
+        ),
+        elevatedButtonTheme: ElevatedButtonThemeData(
+          style: ElevatedButton.styleFrom(
+            primary: Colors.orangeAccent,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(18.0),
+            ),
+            padding: EdgeInsets.symmetric(horizontal: 30, vertical: 15),
+            textStyle: TextStyle(fontSize: 18),
+          ),
+        ),
+        textTheme: TextTheme(
+          bodyText1: TextStyle(color: Colors.grey[800], fontSize: 16),
+          bodyText2: TextStyle(color: Colors.grey[700]),
+          headline6: TextStyle(color: Colors.orange[800], fontSize: 22, fontWeight: FontWeight.bold),
+        ),
       ),
       home: AuthPage(), // Початкова сторінка - аутентифікація
     );
@@ -52,27 +80,39 @@ class _AuthPageState extends State<AuthPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Аутентифікація студента'),
-      ),
+      backgroundColor: Colors.grey[200],
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            TextField(
-              controller: _emailController,
-              decoration: InputDecoration(
-                labelText: 'Введіть вашу студентську пошту',
-                errorText: _errorMessage,
+        child: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: <Widget>[
+              Icon(
+                Icons.school,
+                size: 100,
+                color: Colors.orangeAccent,
               ),
-            ),
-            SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _authenticate,
-              child: Text('Увійти'),
-            ),
-          ],
+              SizedBox(height: 40),
+              TextField(
+                controller: _emailController,
+                decoration: InputDecoration(
+                  labelText: 'Введіть вашу студентську пошту',
+                  labelStyle: TextStyle(color: Colors.grey[700]),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  errorText: _errorMessage,
+                  filled: true,
+                  fillColor: Colors.white,
+                ),
+              ),
+              SizedBox(height: 20),
+              ElevatedButton(
+                onPressed: _authenticate,
+                child: Text('Увійти'),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -109,6 +149,9 @@ class _MainPageState extends State<MainPage> {
       ),
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.orange[600],
+        selectedItemColor: Colors.white,
+        unselectedItemColor: Colors.white70,
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: const <BottomNavigationBarItem>[
@@ -129,6 +172,9 @@ class _MainPageState extends State<MainPage> {
             label: 'Профіль',
           ),
         ],
+        type: BottomNavigationBarType.fixed, // Залишаємо статичний тип
+        selectedFontSize: 14, // Розмір шрифту для вибраних елементів
+        unselectedFontSize: 12, // Розмір шрифту для невибраних елементів
       ),
     );
   }
@@ -139,7 +185,10 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text('Тут буде розклад занять'),
+      child: Text(
+        'Тут буде розклад занять',
+        style: TextStyle(fontSize: 24, color: Colors.orange[800]),
+      ),
     );
   }
 }
@@ -149,7 +198,10 @@ class CoursesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text('Тут буде список дисциплін по курсам'),
+      child: Text(
+        'Тут буде список дисциплін по курсам',
+        style: TextStyle(fontSize: 24, color: Colors.orange[800]),
+      ),
     );
   }
 }
@@ -159,7 +211,10 @@ class ElectivesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text('Тут буде вибір вибіркових дисциплін'),
+      child: Text(
+        'Тут буде вибір вибіркових дисциплін',
+        style: TextStyle(fontSize: 24, color: Colors.orange[800]),
+      ),
     );
   }
 }
@@ -169,7 +224,42 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text('Тут буде профіль користувача'),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircleAvatar(
+            radius: 50,
+            backgroundColor: Colors.orangeAccent,
+            child: Icon(
+              Icons.person,
+              size: 50,
+              color: Colors.white,
+            ),
+          ),
+          SizedBox(height: 20),
+          Text(
+            'Ім\'я Прізвище',
+            style: TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
+              color: Colors.orange[800],
+            ),
+          ),
+          SizedBox(height: 10),
+          Text(
+            'Спеціальність: Комп\'ютерні науки',
+            style: TextStyle(fontSize: 18, color: Colors.grey[700]),
+          ),
+          Text(
+            'Курс: 3',
+            style: TextStyle(fontSize: 18, color: Colors.grey[700]),
+          ),
+          Text(
+            'Шифр групи: KN1B21',
+            style: TextStyle(fontSize: 18, color: Colors.grey[700]),
+          ),
+        ],
+      ),
     );
   }
 }
