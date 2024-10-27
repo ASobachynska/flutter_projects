@@ -4,29 +4,45 @@ void main() {
   runApp(StudentApp());
 }
 
+// Клас з визначенням кольорів
+class AppColors {
+  static const primary = Colors.orange;
+  static const primaryDark = Colors.orangeAccent;
+  static const appBarBackground = Colors.orange;
+  static const scaffoldBackground = Colors.grey;
+  static const iconColor = Colors.white;
+  static const textPrimary = Colors.orange;
+  static const textSecondary = Colors.grey;
+  static const cardBackground = Colors.grey;
+}
+
 class StudentApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Student App',
       theme: ThemeData(
-        primarySwatch: Colors.orange,
+        primarySwatch: AppColors.primary,
         brightness: Brightness.light,
-        scaffoldBackgroundColor: Colors.grey[100],
+        scaffoldBackgroundColor: AppColors.scaffoldBackground[100],
         appBarTheme: AppBarTheme(
-          backgroundColor: Colors.orange[700],
-          titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.bold),
-          iconTheme: IconThemeData(color: Colors.white),
+          backgroundColor: AppColors.appBarBackground[700],
+          titleTextStyle: TextStyle(
+            color: AppColors.iconColor,
+            fontSize: 20,
+            fontWeight: FontWeight.bold,
+          ),
+          iconTheme: IconThemeData(color: AppColors.iconColor),
         ),
         buttonTheme: ButtonThemeData(
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(18.0),
           ),
-          buttonColor: Colors.orangeAccent,
+          buttonColor: AppColors.primaryDark,
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            primary: Colors.orangeAccent,
+            primary: AppColors.primaryDark,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(18.0),
             ),
@@ -36,16 +52,19 @@ class StudentApp extends StatelessWidget {
         ),
         textTheme: TextTheme(
           bodyText1: TextStyle(color: Colors.grey[800], fontSize: 16),
-          bodyText2: TextStyle(color: Colors.grey[700]),
-          headline6: TextStyle(color: Colors.orange[800], fontSize: 22, fontWeight: FontWeight.bold),
+          bodyText2: TextStyle(color: AppColors.textSecondary[700]),
+          headline6: TextStyle(
+            color: AppColors.textPrimary[800],
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+          ),
         ),
       ),
-      home: AuthPage(), // Початкова сторінка - аутентифікація
+      home: AuthPage(),
     );
   }
 }
 
-// Сторінка аутентифікації
 class AuthPage extends StatefulWidget {
   @override
   _AuthPageState createState() => _AuthPageState();
@@ -58,16 +77,26 @@ class _AuthPageState extends State<AuthPage> {
   void _authenticate() {
     final email = _emailController.text;
     if (email.endsWith('@kpnu.edu.ua')) {
-      final year = int.tryParse(email.substring(4, 6)); // Витягуємо рік з email
-      final currentYear = DateTime.now().year % 100; // Поточний рік у форматі двох цифр
-      if (year != null && (currentYear - year) >= 0 && (currentYear - year) <= 4) {
+      // Знаходимо символи після 'b' або 'm' в шифрі групи
+      String yearStr = '';
+      if (email.contains('b')) {
+        yearStr = email.split('b')[1].substring(0, 2);
+      } else if (email.contains('m')) {
+        yearStr = email.split('m')[1].substring(0, 2);
+      }
+      
+      final year = int.tryParse(yearStr);
+      final currentYear = DateTime.now().year % 100; // Останні дві цифри поточного року
+
+      if (year != null && (currentYear - year) >= 0) {
+        final groupCode = email.substring(0, email.indexOf('.')); // Отримуємо шифр групи
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => MainPage()),
+          MaterialPageRoute(builder: (context) => MainPage(groupCode: groupCode)),
         );
       } else {
         setState(() {
-          _errorMessage = 'Неправильний рік навчання!';
+          _errorMessage = 'Неправильний рік навчання!'; // Помилка, якщо курс не коректний
         });
       }
     } else {
@@ -80,7 +109,7 @@ class _AuthPageState extends State<AuthPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      backgroundColor: AppColors.cardBackground[200],
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Center(
@@ -90,14 +119,14 @@ class _AuthPageState extends State<AuthPage> {
               Icon(
                 Icons.school,
                 size: 100,
-                color: Colors.orangeAccent,
+                color: AppColors.primaryDark,
               ),
               SizedBox(height: 40),
               TextField(
                 controller: _emailController,
                 decoration: InputDecoration(
                   labelText: 'Введіть вашу студентську пошту',
-                  labelStyle: TextStyle(color: Colors.grey[700]),
+                  labelStyle: TextStyle(color: AppColors.textSecondary[700]),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
                   ),
@@ -119,8 +148,11 @@ class _AuthPageState extends State<AuthPage> {
   }
 }
 
-// Основна сторінка з навігацією
 class MainPage extends StatefulWidget {
+  final String groupCode; // Додаємо параметр для шифра групи
+
+  MainPage({required this.groupCode}); // Конструктор
+
   @override
   _MainPageState createState() => _MainPageState();
 }
@@ -132,7 +164,6 @@ class _MainPageState extends State<MainPage> {
     HomePage(),
     CoursesPage(),
     ElectivesPage(),
-    ProfilePage(),
   ];
 
   void _onItemTapped(int index) {
@@ -145,13 +176,15 @@ class _MainPageState extends State<MainPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Студентський додаток'),
+        title: Text('Додаток Студент'),
       ),
-      body: _pages[_selectedIndex],
+      body: _selectedIndex == 3
+          ? ProfilePage(groupCode: widget.groupCode) // Передача groupCode до ProfilePage
+          : _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.orange[600],
-        selectedItemColor: Colors.white,
-        unselectedItemColor: Colors.white70,
+        backgroundColor: AppColors.appBarBackground[600],
+        selectedItemColor: AppColors.iconColor,
+        unselectedItemColor: AppColors.iconColor.withOpacity(0.7),
         currentIndex: _selectedIndex,
         onTap: _onItemTapped,
         items: const <BottomNavigationBarItem>[
@@ -172,68 +205,84 @@ class _MainPageState extends State<MainPage> {
             label: 'Профіль',
           ),
         ],
-        type: BottomNavigationBarType.fixed, // Залишаємо статичний тип
-        selectedFontSize: 14, // Розмір шрифту для вибраних елементів
-        unselectedFontSize: 12, // Розмір шрифту для невибраних елементів
+        type: BottomNavigationBarType.fixed,
+        selectedFontSize: 14,
+        unselectedFontSize: 12,
       ),
     );
   }
 }
 
-// Головна сторінка
 class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Text(
         'Тут буде розклад занять',
-        style: TextStyle(fontSize: 24, color: Colors.orange[800]),
+        style: TextStyle(fontSize: 24, color: AppColors.textPrimary[800]),
       ),
     );
   }
 }
 
-// Сторінка з дисциплінами
 class CoursesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Text(
         'Тут буде список дисциплін по курсам',
-        style: TextStyle(fontSize: 24, color: Colors.orange[800]),
+        style: TextStyle(fontSize: 24, color: AppColors.textPrimary[800]),
       ),
     );
   }
 }
 
-// Сторінка вибіркових дисциплін
 class ElectivesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
       child: Text(
         'Тут буде вибір вибіркових дисциплін',
-        style: TextStyle(fontSize: 24, color: Colors.orange[800]),
+        style: TextStyle(fontSize: 24, color: AppColors.textPrimary[800]),
       ),
     );
   }
 }
 
-// Сторінка профілю
 class ProfilePage extends StatelessWidget {
+  final String groupCode;
+
+  ProfilePage({required this.groupCode});
+
   @override
   Widget build(BuildContext context) {
+    String specialty = 'Комп\'ютерні науки';
+    String studyType;
+
+    if (groupCode.contains('b')) {
+      studyType = 'бакалавр';
+    } else if (groupCode.contains('m')) {
+      studyType = 'магістр';
+    } else {
+      studyType = 'невідомий'; // Випадок для обробки, якщо тип навчання не відомий
+    }
+
+    int yearOfAdmission = int.tryParse(groupCode.substring(4, 6)) ?? 0; // Виправлено, щоб брати два символи
+    int currentYear = DateTime.now().year % 100;
+
+    int course = currentYear - yearOfAdmission + 1;
+
     return Center(
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           CircleAvatar(
             radius: 50,
-            backgroundColor: Colors.orangeAccent,
+            backgroundColor: AppColors.primaryDark,
             child: Icon(
               Icons.person,
               size: 50,
-              color: Colors.white,
+              color: AppColors.iconColor,
             ),
           ),
           SizedBox(height: 20),
@@ -242,21 +291,21 @@ class ProfilePage extends StatelessWidget {
             style: TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
-              color: Colors.orange[800],
+              color: AppColors.textPrimary[800],
             ),
           ),
           SizedBox(height: 10),
           Text(
-            'Спеціальність: Комп\'ютерні науки',
-            style: TextStyle(fontSize: 18, color: Colors.grey[700]),
+            'Спеціальність: $specialty',
+            style: TextStyle(fontSize: 18, color: AppColors.textSecondary[700]),
           ),
           Text(
-            'Курс: 3',
-            style: TextStyle(fontSize: 18, color: Colors.grey[700]),
+            'Тип навчання: $studyType',
+            style: TextStyle(fontSize: 18, color: AppColors.textSecondary[700]),
           ),
           Text(
-            'Шифр групи: KN1B21',
-            style: TextStyle(fontSize: 18, color: Colors.grey[700]),
+            'Курс: $course',
+            style: TextStyle(fontSize: 18, color: AppColors.textSecondary[700]),
           ),
         ],
       ),
