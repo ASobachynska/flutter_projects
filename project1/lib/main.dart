@@ -81,7 +81,8 @@ class _AuthPageState extends State<AuthPage> {
       String yearStr = '';
       if (email.contains('b')) {
         yearStr = email.split('b')[1].substring(0, 2);
-      } else if (email.contains('m')) {
+      }
+      if (email.contains('m')) {
         yearStr = email.split('m')[1].substring(0, 2);
       }
       
@@ -135,11 +136,19 @@ class _AuthPageState extends State<AuthPage> {
                   fillColor: Colors.white,
                 ),
               ),
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _authenticate,
-                child: Text('Увійти'),
-              ),
+             SizedBox(height: 20),
+ElevatedButton(
+  onPressed: _authenticate,
+  style: ElevatedButton.styleFrom(
+    primary: AppColors.primaryDark, // Колір фону кнопки
+    onPrimary: AppColors.iconColor, // Колір тексту кнопки
+  ),
+  child: Text(
+    'Увійти',
+    style: TextStyle(color: AppColors.iconColor), // Задаємо колір тексту
+  ),
+),
+
             ],
           ),
         ),
